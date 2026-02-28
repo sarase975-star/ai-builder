@@ -1,15 +1,20 @@
 # agents/coder.py
+import os
+from openai import OpenAI
 
-from core.llm_client import call_model
+HF_API_KEY = os.environ["HF_API_KEY"]
 
-def generate_code(step):
+client = OpenAI(
+    base_url="https://router.huggingface.co/v1",
+    api_key=HF_API_KEY,
+)
 
-    messages = [
-        {"role": "system", "content": "You are a senior Python developer. Return full working files."},
-        {"role": "user", "content": step}
-    ]
-
-    return call_model(
-        "moonshotai/Kimi-K2-Instruct-0905:groq",
-        messages
+def code_task(plan: str) -> str:
+    """
+    Generate code from a plan.
+    """
+    completion = client.chat.completions.create(
+        model="moonshotai/Kimi-K2-Instruct-0905",
+        messages=[{"role": "user", "content": f"Write code for this plan:\n{plan}"}],
     )
+    return completion.choices[0].message
