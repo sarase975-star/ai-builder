@@ -1,4 +1,8 @@
-from openai import OpenAI  # ❌ crashes if module not installed
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
+
 fastapi==0.111.0
 uvicorn==0.23.0
 python-telegram-bot==20.3
