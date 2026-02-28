@@ -1,15 +1,20 @@
 # agents/debugger.py
+import os
+from openai import OpenAI
 
-from core.llm_client import call_model
+HF_API_KEY = os.environ["HF_API_KEY"]
 
-def fix_code(code, error):
+client = OpenAI(
+    base_url="https://router.huggingface.co/v1",
+    api_key=HF_API_KEY,
+)
 
-    messages = [
-        {"role": "system", "content": "You are an expert debugger. Fix the code fully."},
-        {"role": "user", "content": f"Code:\n{code}\n\nError:\n{error}"}
-    ]
-
-    return call_model(
-        "moonshotai/Kimi-K2-Instruct-0905:groq",
-        messages
+def debug_task(code: str) -> str:
+    """
+    Fix any issues in code.
+    """
+    completion = client.chat.completions.create(
+        model="moonshotai/Kimi-K2-Instruct-0905",
+        messages=[{"role": "user", "content": f"Debug/fix this code:\n{code}"}],
     )
+    return completion.choices[0].message
